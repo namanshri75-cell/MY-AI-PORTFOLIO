@@ -34,7 +34,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResumePreview })
             <div className="flex items-center gap-3 p-1.5 pr-3.5 rounded-full bespoke-card mb-5 shadow-xl transition-all max-w-full">
               <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-cyan-400/80 shadow-[0_0_14px_rgba(0,255,198,0.3)] flex-shrink-0">
                 <img
-                  src="/naman_dp.jpg"
+                  src="./naman_dp.jpg"
                   alt="Naman Srivastava"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover object-top"

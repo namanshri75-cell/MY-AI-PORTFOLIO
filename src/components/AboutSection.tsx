@@ -30,7 +30,7 @@ export const AboutSection: React.FC = () => {
             <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bespoke-card flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
               <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-cyan-400/60 shadow-[0_0_20px_rgba(0,255,198,0.2)] flex-shrink-0 group">
                 <img
-                  src="/naman_dp.jpg"
+                  src="./naman_dp.jpg"
                   alt="Naman Srivastava"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"

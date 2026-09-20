@@ -120,7 +120,7 @@ export const ContactSection: React.FC = () => {
                   <div className="relative">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 2xl:w-24 2xl:h-24 rounded-2xl overflow-hidden border-2 border-cyan-400/60 shadow-[0_0_20px_rgba(0,255,198,0.2)]">
                       <img
-                        src="/naman_dp.jpg"
+                        src="./naman_dp.jpg"
                         alt="Naman Srivastava"
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover object-top"

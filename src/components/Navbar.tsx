@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResumePreview }) => {
           >
             <div className="relative w-9 h-9 2xl:w-10 2xl:h-10 rounded-full overflow-hidden border-2 border-cyan-400 shadow-[0_0_12px_rgba(0,255,198,0.35)] flex-shrink-0 group-hover:scale-105 transition-transform">
               <img
-                src="/naman_dp.jpg"
+                src="./naman_dp.jpg"
                 alt="Naman Srivastava"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover object-top"

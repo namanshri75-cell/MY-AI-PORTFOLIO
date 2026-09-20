@@ -68,7 +68,7 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
 
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-cyan-400/60 shadow-md flex-shrink-0">
               <img
-                src="/naman_dp.jpg"
+                src="./naman_dp.jpg"
                 alt="Naman Srivastava"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover object-top"

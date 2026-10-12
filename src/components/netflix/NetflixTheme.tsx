@@ -13,9 +13,13 @@ import { Play, Sparkles, Trophy, Presentation, Star, Layers, Cpu, Network, Shiel
 
 interface NetflixThemeProps {
   onSwitchToClassic: () => void;
+  onReplayIntro?: () => void;
 }
 
-export const NetflixTheme: React.FC<NetflixThemeProps> = ({ onSwitchToClassic }) => {
+export const NetflixTheme: React.FC<NetflixThemeProps> = ({
+  onSwitchToClassic,
+  onReplayIntro,
+}) => {
   const [selectedTitle, setSelectedTitle] = useState<NetflixTitleItem | null>(null);
   const [selectedAchievement, setSelectedAchievement] = useState<NetflixTitleItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -426,6 +430,7 @@ export const NetflixTheme: React.FC<NetflixThemeProps> = ({ onSwitchToClassic })
       {/* Netflix Top Navigation */}
       <NetflixNavbar
         onSwitchToClassic={onSwitchToClassic}
+        onReplayIntro={onReplayIntro}
         onSearchQueryChange={setSearchQuery}
         searchQuery={searchQuery}
       />

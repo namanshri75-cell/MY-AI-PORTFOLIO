@@ -412,7 +412,7 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
                   <div className="px-4 py-3 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#E50914]/60 shadow-[0_0_15px_rgba(229,9,20,0.4)] flex-shrink-0 bg-black">
-                        <img src="/nexa_avatar.svg" alt="NEXA AI Thumbnail" className="w-full h-full object-cover" />
+                        <img src="./nexa_avatar.svg" alt="NEXA AI Thumbnail" className="w-full h-full object-cover" />
                         <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-black animate-pulse" />
                       </div>
                       <div>
@@ -484,7 +484,7 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
                           {/* NEXA Thumbnail Avatar */}
                           {isNexa && (
                             <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[#E50914]/50 flex-shrink-0 shadow bg-black mt-0.5">
-                              <img src="/nexa_avatar.svg" alt="NEXA" className="w-full h-full object-cover" />
+                              <img src="./nexa_avatar.svg" alt="NEXA" className="w-full h-full object-cover" />
                             </div>
                           )}
 
@@ -500,7 +500,7 @@ export const NetflixModal: React.FC<NetflixModalProps> = ({
                               <div className="mb-2.5 p-2 rounded-xl bg-black/70 border border-[#E50914]/40 flex items-center gap-3">
                                 <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#E50914] shadow-[0_0_12px_rgba(229,9,20,0.5)] flex-shrink-0 bg-black">
                                   <img
-                                    src="/nexa_avatar.svg"
+                                    src="./nexa_avatar.svg"
                                     alt="NEXA AI Assistant"
                                     className="w-full h-full object-cover"
                                   />

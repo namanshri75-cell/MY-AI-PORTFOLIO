@@ -89,27 +89,36 @@ class NexaVoiceEngine {
   }
 
   /**
+   * Helper to resolve audio asset URL relative to Vite base (works on GitHub Pages, custom domains, and localhost)
+   */
+  private resolveAssetUrl(relativePath: string): string {
+    const base = import.meta.env.BASE_URL || "./";
+    const clean = relativePath.startsWith("/") ? relativePath.slice(1) : relativePath;
+    return `${base}${clean}`.replace(/([^:]\/)\/+/g, "$1");
+  }
+
+  /**
    * Determine matching pre-rendered audio asset for common queries
    */
   private matchAsset(text: string): string | null {
     const q = text.toLowerCase();
     if (q.includes("why hire") || (q.includes("hire") && q.includes("naman"))) {
-      return "/audio/nexa/why_hire.mp3";
+      return this.resolveAssetUrl("audio/nexa/why_hire.mp3");
     }
     if (q.includes("who is naman") || q.includes("who is he") || q.includes("naman srivastava is a driven")) {
-      return "/audio/nexa/who_is_naman.mp3";
+      return this.resolveAssetUrl("audio/nexa/who_is_naman.mp3");
     }
     if (q.includes("skills") || q.includes("core ai") || q.includes("capabilities") || q.includes("generative ai, prompt engineering")) {
-      return "/audio/nexa/skills.mp3";
+      return this.resolveAssetUrl("audio/nexa/skills.mp3");
     }
     if (q.includes("support") || q.includes("ticket") || q.includes("csat") || q.includes("clickretina")) {
-      return "/audio/nexa/support.mp3";
+      return this.resolveAssetUrl("audio/nexa/support.mp3");
     }
     if (q.includes("excel") || q.includes("dashboard") || q.includes("metric") || q.includes("kpi") || q.includes("revenue synthesis")) {
-      return "/audio/nexa/excel.mp3";
+      return this.resolveAssetUrl("audio/nexa/excel.mp3");
     }
     if (q.includes("bba") || q.includes("education") || q.includes("degree") || q.includes("business administration")) {
-      return "/audio/nexa/bba.mp3";
+      return this.resolveAssetUrl("audio/nexa/bba.mp3");
     }
     if (
       q.includes("welcome to the nexa") ||
@@ -123,7 +132,7 @@ class NexaVoiceEngine {
       q.includes("tap any question below") ||
       q.includes("voice-assisted reasoning")
     ) {
-      return "/audio/nexa/welcome.mp3";
+      return this.resolveAssetUrl("audio/nexa/welcome.mp3");
     }
     return null;
   }

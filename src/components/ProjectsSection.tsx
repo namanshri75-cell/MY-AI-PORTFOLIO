@@ -231,7 +231,7 @@ export const ProjectsSection: React.FC = () => {
                   <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-slate-300 font-sans flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
                     <div className="flex items-center gap-3">
                       <div className="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-cyan-400/60 shadow-[0_0_15px_rgba(6,182,212,0.4)] flex-shrink-0 bg-slate-950 group">
-                        <img src="/nexa_avatar.svg" alt="NEXA Assistant Thumbnail" className="w-full h-full object-cover" />
+                        <img src="./nexa_avatar.svg" alt="NEXA Assistant Thumbnail" className="w-full h-full object-cover" />
                         <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 border border-slate-950 animate-pulse" />
                       </div>
                       <div>
@@ -301,7 +301,7 @@ export const ProjectsSection: React.FC = () => {
                           {/* NEXA Avatar Thumbnail */}
                           {isNexa && (
                             <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-cyan-500/40 flex-shrink-0 shadow-sm bg-slate-900 mt-0.5">
-                              <img src="/nexa_avatar.svg" alt="NEXA" className="w-full h-full object-cover" />
+                              <img src="./nexa_avatar.svg" alt="NEXA" className="w-full h-full object-cover" />
                             </div>
                           )}
 
@@ -317,7 +317,7 @@ export const ProjectsSection: React.FC = () => {
                               <div className="mb-2.5 p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center gap-3">
                                 <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.4)] flex-shrink-0 bg-slate-950">
                                   <img
-                                    src="/nexa_avatar.svg"
+                                    src="./nexa_avatar.svg"
                                     alt="NEXA AI Prototype"
                                     className="w-full h-full object-cover"
                                   />

@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Bell, ChevronDown, Check, FileDown, ExternalLink, Sparkles, X, Undo2 } from "lucide-react";
+import { Search, Bell, ChevronDown, Check, FileDown, ExternalLink, Sparkles, X, Undo2, Clapperboard } from "lucide-react";
 import { PERSONAL_INFO } from "../../data/portfolioData";
 import { generateResumePDF } from "../../utils/resumePdf";
 import { netflixAudio } from "../../utils/netflixAudio";
 
 interface NetflixNavbarProps {
   onSwitchToClassic: () => void;
+  onReplayIntro?: () => void;
   onSearchQueryChange: (query: string) => void;
   searchQuery: string;
 }
 
 export const NetflixNavbar: React.FC<NetflixNavbarProps> = ({
   onSwitchToClassic,
+  onReplayIntro,
   onSearchQueryChange,
   searchQuery,
 }) => {
@@ -264,6 +266,21 @@ export const NetflixNavbar: React.FC<NetflixNavbarProps> = ({
                     <span>GitHub Repositories</span>
                     <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
                   </a>
+                  {onReplayIntro && (
+                    <button
+                      onClick={() => {
+                        netflixAudio.playClick();
+                        setProfileOpen(false);
+                        onReplayIntro();
+                      }}
+                      className="w-full px-2.5 py-2 text-left rounded hover:bg-neutral-800 text-white font-medium flex items-center justify-between text-xs"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Clapperboard className="w-3.5 h-3.5 text-[#E50914]" />
+                        <span>Replay Netflix Intro (TA-DUM)</span>
+                      </span>
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setProfileOpen(false);

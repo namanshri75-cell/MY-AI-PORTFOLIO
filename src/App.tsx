@@ -33,6 +33,19 @@ export default function App() {
   });
   const [showNetflixIntro, setShowNetflixIntro] = useState(false);
 
+  useEffect(() => {
+    try {
+      const search = window.location.search.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (search.includes("netflix") || hash.includes("netflix") || search.includes("intro")) {
+        setThemeMode("netflix");
+        setShowNetflixIntro(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const handleSwitchToNetflix = () => {
     // Mount Netflix theme underneath immediately so billboard & assets are ready
     setThemeMode("netflix");
@@ -42,6 +55,10 @@ export default function App() {
       // ignore
     }
     // Show the iconic Netflix TA-DUM intro animation over it
+    setShowNetflixIntro(true);
+  };
+
+  const handleReplayIntro = () => {
     setShowNetflixIntro(true);
   };
 
@@ -66,7 +83,10 @@ export default function App() {
 
       {themeMode === "netflix" ? (
         /* Full-Fledged Netflix Theme View */
-        <NetflixTheme onSwitchToClassic={handleSwitchToClassic} />
+        <NetflixTheme
+          onSwitchToClassic={handleSwitchToClassic}
+          onReplayIntro={handleReplayIntro}
+        />
       ) : (
         /* Classic High-Tech Cybernetic Portfolio View */
         <div className="min-h-screen bg-[#06080d] text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden relative">

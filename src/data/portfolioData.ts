@@ -14,7 +14,7 @@ export const PERSONAL_INFO = {
 
 export const ABOUT_TEXT = {
   heading: "ABOUT ME",
-  lead: "I'm a BBA student with practical experience in technical support and a strong interest in AI applications, automation, Generative AI, and emerging technology.",
+  lead: "I'm a BBA graduate with practical experience in technical support and a strong interest in AI applications, automation, Generative AI, and emerging technology.",
   secondary: "I enjoy experimenting with AI tools and turning ideas into practical digital concepts — particularly applications that can simplify repetitive tasks, improve workflows, and create better user experiences.",
   pillars: [
     {
@@ -222,7 +222,7 @@ export const LEADERSHIP_ITEM = {
 export const EDUCATION_ITEM = {
   degree: "Bachelor of Business Administration (BBA)",
   institution: "BBD University, Lucknow",
-  description: "Studying core business principles, management strategies, organizational behavior, and technology integration. Bridging business economics with digital automation.",
+  description: "Graduated with a strong foundation in core business principles, management strategies, organizational behavior, and technology integration. Bridging business economics with digital automation.",
 };
 
 export const CERTIFICATION_ITEM = {

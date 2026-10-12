@@ -1,37 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PROJECTS } from "../data/portfolioData";
 import { Project } from "../types";
-import { Sparkles, ExternalLink, Github, Layers, ArrowUpRight, Play, CheckCircle2, MessageSquare, BarChart3, Users, Terminal, X, Send, Bot } from "lucide-react";
+import { Sparkles, ExternalLink, Github, Layers, ArrowUpRight, Play, CheckCircle2, MessageSquare, BarChart3, Users, Terminal, X, Bot, Volume2, VolumeX, Square, Sparkle } from "lucide-react";
+import { nexaVoice } from "../utils/nexaVoice";
 
 export const ProjectsSection: React.FC = () => {
   const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
-  const [nexaInput, setNexaInput] = useState("");
+  const [currentlySpeakingIndex, setCurrentlySpeakingIndex] = useState<number | null>(null);
+  const [voiceAutoPlay, setVoiceAutoPlay] = useState<boolean>(true);
   const [nexaMessages, setNexaMessages] = useState<Array<{ role: "user" | "nexa"; text: string }>>([
     {
       role: "nexa",
-      text: "Hello! I am NEXA, an AI assistant concept designed by Naman. I focus on practical workflow assistance, conversational clarity, and voice-assisted interactions. How can I help explore automation today?",
+      text: "Welcome to the NEXA interactive demo screen! I am an AI assistant prototype built by Naman Srivastava. Click any inquiry below to explore my reasoning and listen to my spoken answers.",
     },
   ]);
 
-  const handleSendNexa = (textToSend?: string) => {
-    const q = textToSend || nexaInput;
-    if (!q.trim()) return;
+  // Clean up speech synthesis on unmount or modal close
+  useEffect(() => {
+    return () => {
+      nexaVoice.stop();
+    };
+  }, [activeModalProject]);
 
-    const newMsgs = [...nexaMessages, { role: "user" as const, text: q }];
+  const speakText = (text: string, index: number) => {
+    if (currentlySpeakingIndex === index) {
+      nexaVoice.stop();
+      setCurrentlySpeakingIndex(null);
+      return;
+    }
+
+    setCurrentlySpeakingIndex(index);
+    nexaVoice.speak(text, index, {
+      onStart: () => setCurrentlySpeakingIndex(index),
+      onEnd: () => setCurrentlySpeakingIndex(null),
+      onError: () => setCurrentlySpeakingIndex(null),
+    });
+  };
+
+  const handleSendNexa = (question: string) => {
+    if (!question.trim()) return;
+
+    const newMsgs = [...nexaMessages, { role: "user" as const, text: question }];
     setNexaMessages(newMsgs);
-    setNexaInput("");
 
     setTimeout(() => {
-      let reply = "I analyzed that request using workflow automation concepts. By connecting an AI model to an event webhook, we can automate this task seamlessly.";
-      if (q.toLowerCase().includes("support") || q.toLowerCase().includes("ticket")) {
-        reply = "In technical support operations, I can auto-triage ticket urgency, extract order numbers from user messages, and draft empathy-focused responses for human review.";
-      } else if (q.toLowerCase().includes("excel") || q.toLowerCase().includes("dashboard")) {
-        reply = "Spreadsheet analysis concept: I can ingest CSV records, compute metric variances, and suggest visual chart groupings for executive reporting.";
-      } else if (q.toLowerCase().includes("fit") || q.toLowerCase().includes("automation") || q.toLowerCase().includes("role")) {
-        reply = "I combine a business administration perspective with hands-on automation prototyping and verified support problem solving to streamline operations and drive business ROI.";
+      let reply =
+        "I analyzed that request using workflow automation concepts. By connecting an AI model to an event webhook and business APIs, we can automate this task seamlessly.";
+
+      const q = question.toLowerCase();
+      if (q.includes("why hire") || (q.includes("hire") && q.includes("naman"))) {
+        reply =
+          "Why hire Naman: He bridges the critical gap between business administration and hands-on AI engineering. With a BBA degree from BBD University, battle-tested technical support experience at Clickretina resolving high-volume issues under SLAs, a Hackathon Championship win, and keynote speaking at IIT Roorkee, Naman delivers real ROI by converting tedious manual bottlenecks into automated, high-speed AI workflows.";
+      } else if (q.includes("who is naman") || q.includes("who is he")) {
+        reply =
+          "Who is Naman: Naman Srivastava is a BBA graduate turned AI operations builder and automation engineer. He designs autonomous workflows, prototypes generative AI tools, and implements robust technical solutions with tools like n8n, LLM APIs, and webhooks to solve real business challenges.";
+      } else if (q.includes("skills") || q.includes("core ai")) {
+        reply =
+          "Naman's core technical capabilities span Generative AI integration, workflow automation with n8n & webhooks, technical troubleshooting, API development, rapid prototyping, and translating business processes into automated data pipelines.";
+      } else if (q.includes("support") || q.includes("ticket")) {
+        reply =
+          "In technical support operations, AI auto-triages ticket urgency, extracts order identifiers from incoming customer messages, drafts high-empathy responses, and accelerates resolution times while elevating CSAT scores.";
+      } else if (q.includes("excel") || q.includes("dashboard")) {
+        reply =
+          "The AI Excel Dashboard concept ingests multi-sheet CSV or workbook data, parses schemas, calculates variance metrics, and automatically generates interactive executive KPI visual reports.";
+      } else if (q.includes("bba") || q.includes("education") || q.includes("degree")) {
+        reply =
+          "Naman holds a Bachelor of Business Administration (BBA) degree from BBD University, Lucknow. This academic foundation grounds his technical projects in organizational strategy, profitability, and cost-effective operations.";
       }
-      setNexaMessages((prev) => [...prev, { role: "nexa", text: reply }]);
-    }, 600);
+
+      setNexaMessages((prev) => {
+        const updated = [...prev, { role: "nexa" as const, text: reply }];
+        if (voiceAutoPlay) {
+          // Speak the new message automatically
+          setTimeout(() => speakText(reply, updated.length - 1), 100);
+        }
+        return updated;
+      });
+    }, 450);
   };
 
   return (
@@ -182,72 +227,254 @@ export const ProjectsSection: React.FC = () => {
               {/* Demo Type 1: NEXA Assistant Conversation */}
               {activeModalProject.interactiveType === "nexa" && (
                 <div className="flex flex-col gap-3 sm:gap-4">
-                  <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-xs text-slate-300 font-sans">
-                    <span className="font-bold text-cyan-300">NEXA Concept Demo:</span> Test sample prompts below or type your own question to experience the conversational and support reasoning concept.
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    <button
-                      onClick={() => handleSendNexa("How can AI assist technical support tickets?")}
-                      className="px-2.5 py-1.5 text-[11px] sm:text-xs rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 min-h-[36px]"
-                    >
-                      "How can AI assist support tickets?"
-                    </button>
-                    <button
-                      onClick={() => handleSendNexa("How does Excel dashboard generation work?")}
-                      className="px-2.5 py-1.5 text-[11px] sm:text-xs rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 min-h-[36px]"
-                    >
-                      "How does Excel dashboard work?"
-                    </button>
-                    <button
-                      onClick={() => handleSendNexa("Why are you a fit for AI Operations?")}
-                      className="px-2.5 py-1.5 text-[11px] sm:text-xs rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700 min-h-[36px]"
-                    >
-                      "Why a fit for AI Operations?"
-                    </button>
-                  </div>
-
-                  <div className="h-52 sm:h-60 overflow-y-auto space-y-3 p-3 sm:p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                    {nexaMessages.map((m, i) => (
-                      <div
-                        key={i}
-                        className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[85%] sm:max-w-[80%] p-3 rounded-2xl text-xs leading-relaxed ${
-                            m.role === "user"
-                              ? "bg-cyan-500/20 text-cyan-200 border border-cyan-400/40"
-                              : "bg-slate-900 text-slate-200 border border-slate-800"
-                          }`}
-                        >
-                          {m.text}
-                        </div>
+                  {/* Assistant Status & TTS Controls */}
+                  <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-slate-300 font-sans flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-cyan-400/60 shadow-[0_0_15px_rgba(6,182,212,0.4)] flex-shrink-0 bg-slate-950 group">
+                        <img src="/nexa_avatar.svg" alt="NEXA Assistant Thumbnail" className="w-full h-full object-cover" />
+                        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-400 border border-slate-950 animate-pulse" />
                       </div>
-                    ))}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-extrabold text-cyan-300 tracking-wide">NEXA AI Assistant</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono font-bold">
+                            ONLINE TTS
+                          </span>
+                        </div>
+                        <span className="text-slate-400 text-[11px] block mt-0.5">
+                          Tap any question or speaker icon to hear NEXA speak with synchronized voice synthesis.
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (currentlySpeakingIndex !== null) {
+                            nexaVoice.stop();
+                            setCurrentlySpeakingIndex(null);
+                          }
+                          setVoiceAutoPlay(!voiceAutoPlay);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold border flex items-center gap-1.5 transition-all shadow-sm ${
+                          voiceAutoPlay
+                            ? "bg-cyan-500/25 text-cyan-300 border-cyan-500/60 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                            : "bg-slate-800 text-slate-400 border-slate-700 hover:text-white"
+                        }`}
+                        title={voiceAutoPlay ? "Voice TTS auto-playback is ON (Click to mute)" : "Voice TTS is muted (Click to enable)"}
+                      >
+                        {voiceAutoPlay ? <Volume2 className="w-3.5 h-3.5 text-cyan-400 animate-pulse" /> : <VolumeX className="w-3.5 h-3.5" />}
+                        <span>{voiceAutoPlay ? "Auto-TTS: Active" : "TTS: Muted"}</span>
+                      </button>
+
+                      {currentlySpeakingIndex !== null && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            nexaVoice.stop();
+                            setCurrentlySpeakingIndex(null);
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg text-[11px] bg-red-500/25 text-red-200 border border-red-500/50 hover:bg-red-500/35 flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                          <Square className="w-3 h-3 fill-red-400" />
+                          <span>Stop</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSendNexa();
-                    }}
-                    className="flex flex-col sm:flex-row gap-2"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Ask NEXA about workflows or automation..."
-                      value={nexaInput}
-                      onChange={(e) => setNexaInput(e.target.value)}
-                      className="flex-1 px-3.5 py-2.5 min-h-[44px] text-xs rounded-xl bg-slate-900 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                    />
-                    <button
-                      type="submit"
-                      className="px-4 py-2.5 min-h-[44px] rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-cyan-300 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Send</span>
-                    </button>
-                  </form>
+                  {/* Chat messages */}
+                  <div className="h-56 sm:h-64 overflow-y-auto space-y-3.5 p-3.5 sm:p-4 rounded-2xl bg-slate-950/90 border border-slate-800">
+                    {nexaMessages.map((m, i) => {
+                      const isSpeakingThis = currentlySpeakingIndex === i;
+                      const isNexa = m.role === "nexa";
+                      const isWelcomeMessage =
+                        i === 0 &&
+                        m.text.includes("Welcome to the NEXA interactive demo screen");
+
+                      return (
+                        <div
+                          key={i}
+                          className={`flex items-start gap-2.5 ${isNexa ? "justify-start" : "justify-end"}`}
+                        >
+                          {/* NEXA Avatar Thumbnail */}
+                          {isNexa && (
+                            <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-cyan-500/40 flex-shrink-0 shadow-sm bg-slate-900 mt-0.5">
+                              <img src="/nexa_avatar.svg" alt="NEXA" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+
+                          <div
+                            className={`max-w-[85%] sm:max-w-[82%] p-3.5 rounded-2xl text-xs leading-relaxed relative group shadow-sm ${
+                              !isNexa
+                                ? "bg-cyan-500/15 text-cyan-100 border border-cyan-400/30 rounded-tr-xs"
+                                : "bg-slate-900/90 text-slate-200 border border-slate-800/80 rounded-tl-xs pr-8"
+                            }`}
+                          >
+                            {/* Rich Thumbnail Banner for the Welcome Message */}
+                            {isWelcomeMessage && (
+                              <div className="mb-2.5 p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 flex items-center gap-3">
+                                <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.4)] flex-shrink-0 bg-slate-950">
+                                  <img
+                                    src="/nexa_avatar.svg"
+                                    alt="NEXA AI Prototype"
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <span className="absolute bottom-0 inset-x-0 bg-cyan-600 text-[8px] font-black text-center text-white uppercase tracking-tighter py-0.2">
+                                    NEXA AI
+                                  </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-bold text-white">NEXA Neural Engine</span>
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-mono">
+                                      VOICE READY
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-400 truncate">
+                                    Interactive voice synthesis & reasoning
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    speakText(m.text, i);
+                                  }}
+                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 border transition-all ${
+                                    isSpeakingThis
+                                      ? "bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.6)]"
+                                      : "bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-200 border-cyan-700/50"
+                                  }`}
+                                >
+                                  <Volume2 className="w-3 h-3 text-cyan-300" />
+                                  <span>{isSpeakingThis ? "Speaking..." : "Play Intro"}</span>
+                                </button>
+                              </div>
+                            )}
+
+                            <div className={!isNexa ? "pr-7" : ""}>{m.text}</div>
+
+                            {/* Speaker button on EVERY message (NEXA and User) */}
+                            <button
+                              type="button"
+                              onClick={() => speakText(m.text, i)}
+                              aria-label={isSpeakingThis ? "Stop speaking this message" : "Listen to this message"}
+                              className={`absolute top-2.5 right-2 p-1.5 rounded-lg transition-all ${
+                                isSpeakingThis
+                                  ? "bg-cyan-400 text-slate-950 shadow-md ring-2 ring-cyan-300"
+                                  : "text-slate-400 hover:text-white hover:bg-slate-800/80"
+                              }`}
+                              title={isSpeakingThis ? "Stop voice playback" : "Read aloud with TTS"}
+                            >
+                              {isSpeakingThis ? (
+                                <div className="flex items-end gap-0.5 h-3 w-3">
+                                  <span className="w-0.5 bg-slate-950 h-3 animate-bounce" />
+                                  <span className="w-0.5 bg-slate-950 h-2 animate-bounce delay-75" />
+                                  <span className="w-0.5 bg-slate-950 h-3 animate-bounce delay-150" />
+                                </div>
+                              ) : (
+                                <Volume2 className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+
+                          {/* User Avatar */}
+                          {!isNexa && (
+                            <div className="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-[10px] font-bold text-cyan-300 flex-shrink-0 shadow-sm mt-0.5">
+                              YOU
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Curated Interactive Query Buttons (replaces text typing input) */}
+                  <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-400 font-medium pb-1">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Instant Inquiries (Click to hear NEXA reply):</span>
+                      </span>
+                      <span className="text-[10px] text-cyan-400/80 font-mono">6 PRESETS</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSendNexa("Why hire Naman?")}
+                        className="px-3 py-2.5 text-xs text-left rounded-xl bg-gradient-to-r from-cyan-500/15 to-blue-500/10 hover:from-cyan-500/25 hover:to-blue-500/20 text-cyan-200 border border-cyan-500/40 hover:border-cyan-400 transition-all font-semibold flex items-center justify-between group active:scale-98 shadow-sm"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 group-hover:scale-125 transition-transform" />
+                          <span>Why hire Naman?</span>
+                        </span>
+                        <Volume2 className="w-3.5 h-3.5 text-cyan-400 opacity-70 group-hover:opacity-100 transition-opacity" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendNexa("Who is Naman?")}
+                        className="px-3 py-2.5 text-xs text-left rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 transition-all font-medium flex items-center justify-between group active:scale-98"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          <span>Who is Naman?</span>
+                        </span>
+                        <Volume2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendNexa("What are Naman's core AI skills?")}
+                        className="px-3 py-2.5 text-xs text-left rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 transition-all font-medium flex items-center justify-between group active:scale-98"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <span>What are Naman's core AI skills?</span>
+                        </span>
+                        <Volume2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendNexa("How can AI assist support tickets?")}
+                        className="px-3 py-2.5 text-xs text-left rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 transition-all font-medium flex items-center justify-between group active:scale-98"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                          <span>How can AI assist support tickets?</span>
+                        </span>
+                        <Volume2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendNexa("How does Excel dashboard generation work?")}
+                        className="px-3 py-2.5 text-xs text-left rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 transition-all font-medium flex items-center justify-between group active:scale-98"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                          <span>How does the Excel AI dashboard work?</span>
+                        </span>
+                        <Volume2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendNexa("What is his BBA background?")}
+                        className="px-3 py-2.5 text-xs text-left rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 transition-all font-medium flex items-center justify-between group active:scale-98"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                          <span>What is his BBA background?</span>
+                        </span>
+                        <Volume2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -310,7 +537,7 @@ export const ProjectsSection: React.FC = () => {
 
                   <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
                     <div className="flex items-center justify-between text-xs flex-wrap gap-1">
-                      <span className="text-slate-300 font-semibold">User Profile A: BBA + AI Exploration</span>
+                      <span className="text-slate-300 font-semibold">User Profile A: BBA Graduate + AI Exploration</span>
                       <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[11px]">89% Compatibility</span>
                     </div>
                     <div className="text-xs text-slate-400">
@@ -349,12 +576,27 @@ export const ProjectsSection: React.FC = () => {
             {/* Modal Footer */}
             <div className="pt-3 sm:pt-4 mt-3 sm:mt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-slate-400">
               <span className="text-center sm:text-left text-[11px] sm:text-xs">Factual concept exploration for workflow evaluation</span>
-              <button
-                onClick={() => setActiveModalProject(null)}
-                className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-colors flex items-center justify-center font-medium"
-              >
-                Close Preview
-              </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {activeModalProject.githubUrl && (
+                  <a
+                    href={activeModalProject.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2.5 min-h-[44px] rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition-colors flex items-center justify-center gap-2 text-xs font-medium"
+                    title="View GitHub Repository"
+                    aria-label="View on GitHub"
+                  >
+                    <Github className="w-4 h-4" />
+                    <span>GitHub</span>
+                  </a>
+                )}
+                <button
+                  onClick={() => setActiveModalProject(null)}
+                  className="flex-1 sm:flex-none px-4 py-2.5 min-h-[44px] rounded-xl bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/30 transition-colors flex items-center justify-center font-medium"
+                >
+                  Close Preview
+                </button>
+              </div>
             </div>
           </div>
         </div>

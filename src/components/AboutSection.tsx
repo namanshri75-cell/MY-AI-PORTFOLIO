@@ -46,7 +46,7 @@ export const AboutSection: React.FC = () => {
                   <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />
                 </div>
                 <span className="text-xs font-mono text-cyan-400 font-semibold mb-2 tracking-wide break-words">
-                  BBA Student • AI Operations & Automation
+                  BBA Graduate • AI Operations & Automation
                 </span>
                 <p className="text-xs sm:text-[13.5px] text-slate-300/90 leading-relaxed mb-4 font-sans">
                   Focused on building practical automated workflows and evaluating modern AI tools to streamline business operations.
@@ -106,7 +106,7 @@ export const AboutSection: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Education</span>
-                  <span className="text-xs font-bold text-slate-200">BBA Student</span>
+                  <span className="text-xs font-bold text-slate-200">BBA Graduate</span>
                 </div>
               </div>
 

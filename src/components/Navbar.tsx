@@ -5,9 +5,10 @@ import { generateResumePDF } from "../utils/resumePdf";
 
 interface NavbarProps {
   onOpenResumePreview?: () => void;
+  onSwitchToNetflix?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenResumePreview }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenResumePreview, onSwitchToNetflix }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -111,6 +112,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResumePreview }) => {
 
           {/* Action Buttons */}
           <div className="hidden sm:flex items-center gap-2.5">
+            {onSwitchToNetflix && (
+              <button
+                onClick={onSwitchToNetflix}
+                type="button"
+                className="px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-[#E50914] to-red-700 text-white hover:brightness-110 shadow-[0_0_15px_rgba(229,9,20,0.4)] transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95"
+              >
+                <span className="text-sm">🍿</span>
+                <span>Netflix Theme</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 if (onOpenResumePreview) onOpenResumePreview();
@@ -178,6 +190,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResumePreview }) => {
             })}
 
             <div className="pt-4 border-t border-slate-800 flex flex-col gap-2.5 mt-2">
+              {onSwitchToNetflix && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onSwitchToNetflix();
+                  }}
+                  className="w-full min-h-[44px] py-3 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-[#E50914] to-red-700 text-white flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-[0_0_15px_rgba(229,9,20,0.4)]"
+                >
+                  <span className="text-base">🍿</span>
+                  <span>Switch to Netflix Theme</span>
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

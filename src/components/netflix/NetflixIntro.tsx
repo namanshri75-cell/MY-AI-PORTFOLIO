@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Volume2, VolumeX, FastForward, Play, Sparkles } from "lucide-react";
 import { netflixAudio } from "../../utils/netflixAudio";
+import { resolvePublicAsset } from "../../utils/resolveAsset";
 import netflixIntroVideo from "../../assets/netflix_intro.mp4";
 
 interface NetflixIntroProps {
@@ -8,28 +9,31 @@ interface NetflixIntroProps {
 }
 
 export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
-  // Start muted to ensure 100% guaranteed autoplay compliance across all browsers (Chrome, Safari, iOS, GitHub Pages)
-  const [isMuted, setIsMuted] = useState(true);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoFailed, setVideoFailed] = useState(false);
-  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [needsUserTapToPlay, setNeedsUserTapToPlay] = useState(false);
+  const [needsUserTap, setNeedsUserTap] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [useProceduralFallback, setUseProceduralFallback] = useState(false);
+
+  // Candidate sources in order of resilience
+  const candidateSources = React.useMemo(() => [
+    resolvePublicAsset("netflix_intro.mp4"),
+    netflixIntroVideo,
+    "./netflix_intro.mp4",
+    "/netflix_intro.mp4",
+  ], []);
+
+  const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasFinishedRef = useRef(false);
-
-  // Compute base-relative public fallback URL
-  const publicVideoUrl = `${import.meta.env.BASE_URL || "./"}netflix_intro.mp4`.replace(
-    /([^:]\/)\/+/g,
-    "$1"
-  );
 
   const handleFinish = useCallback(() => {
     if (hasFinishedRef.current) return;
     hasFinishedRef.current = true;
     setIsFadingOut(true);
 
-    // Soft audio fade out so TA-DUM finishes smoothly
+    // Gently lower volume before unmount
     const vid = videoRef.current;
     if (vid && !vid.muted) {
       const fadeInterval = setInterval(() => {
@@ -38,75 +42,98 @@ export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
         } else {
           clearInterval(fadeInterval);
         }
-      }, 70);
+      }, 60);
     }
 
     setTimeout(() => {
       onComplete();
-    }, 650);
+    }, 600);
   }, [onComplete]);
 
-  // Attempt video playback on mount
+  // Handle video error by trying next candidate source
+  const handleVideoError = () => {
+    if (currentSourceIndex + 1 < candidateSources.length) {
+      console.warn(
+        `Video source ${candidateSources[currentSourceIndex]} failed, trying next fallback: ${candidateSources[currentSourceIndex + 1]}`
+      );
+      setCurrentSourceIndex((prev) => prev + 1);
+    } else {
+      console.warn("All video sources failed, activating procedural Netflix intro fallback");
+      setUseProceduralFallback(true);
+      netflixAudio.playTadum();
+    }
+  };
+
+  // Attempt playback on mount or source change
   useEffect(() => {
+    if (useProceduralFallback) {
+      const proceduralTimer = setTimeout(() => {
+        handleFinish();
+      }, 3500);
+      return () => clearTimeout(proceduralTimer);
+    }
+
     const vid = videoRef.current;
     if (!vid) return;
 
-    // Safety timeout in case video stalls or fails on very slow connections
-    const maxTimeout = setTimeout(() => {
+    // Generous fallback safety timeout
+    const safetyTimeout = setTimeout(() => {
       handleFinish();
-    }, 5500);
+    }, 12000);
 
-    // Initial attempt: try unmuted first (works if user has interacted with page)
-    vid.muted = false;
     vid.playsInline = true;
 
+    // Try unmuted playback first (works reliably when user switched themes via click)
+    vid.muted = false;
     const playPromise = vid.play();
+
     if (playPromise !== undefined) {
       playPromise
         .then(() => {
           setIsPlaying(true);
           setIsMuted(false);
-          setNeedsUserTapToPlay(false);
+          setNeedsUserTap(false);
         })
         .catch(() => {
-          // Unmuted autoplay blocked by browser policy (standard on GitHub Pages / fresh visits)
-          // Mute and replay immediately — browsers always permit muted autoplay
+          // Autoplay policy prevented unmuted playback.
+          // Switch to muted immediately: muted playback is always permitted.
           vid.muted = true;
           setIsMuted(true);
           vid
             .play()
             .then(() => {
               setIsPlaying(true);
-              setNeedsUserTapToPlay(false);
+              setNeedsUserTap(false);
             })
-            .catch((e) => {
-              console.warn("Autoplay waiting for user touch gesture:", e);
-              // Video is ready, waiting for single tap
-              setNeedsUserTapToPlay(true);
+            .catch(() => {
+              // Both unmuted and muted autoplay restricted by device (e.g. strict low-power mode)
+              setNeedsUserTap(true);
             });
         });
     }
 
-    return () => clearTimeout(maxTimeout);
-  }, [handleFinish]);
+    return () => clearTimeout(safetyTimeout);
+  }, [currentSourceIndex, useProceduralFallback, handleFinish]);
 
-  // Screen click or interaction handler: un-mutes and plays immediately
-  const handleScreenClick = () => {
+  // Screen click or interaction: instantly unmute and play
+  const handleScreenInteraction = () => {
     const vid = videoRef.current;
     if (!vid) return;
 
     if (vid.paused) {
       vid.muted = false;
       setIsMuted(false);
-      vid.play().then(() => {
-        setIsPlaying(true);
-        setNeedsUserTapToPlay(false);
-      }).catch(() => {
-        vid.muted = true;
-        vid.play();
-      });
+      vid
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          setNeedsUserTap(false);
+        })
+        .catch(() => {
+          vid.muted = true;
+          vid.play();
+        });
     } else if (vid.muted) {
-      // Unmute on tap
       vid.muted = false;
       setIsMuted(false);
       netflixAudio.playTadum();
@@ -123,8 +150,9 @@ export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
     setIsMuted(nextMuted);
     netflixAudio.setMuted(nextMuted);
 
-    if (!nextMuted && vid.paused) {
-      vid.play().catch(() => {});
+    if (!nextMuted) {
+      if (vid.paused) vid.play().catch(() => {});
+      netflixAudio.playTadum();
     }
   };
 
@@ -135,62 +163,49 @@ export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
 
   return (
     <div
-      onClick={handleScreenClick}
+      onClick={handleScreenInteraction}
       className={`fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden transition-all duration-700 ease-in-out select-none cursor-pointer ${
         isFadingOut ? "opacity-0 pointer-events-none scale-105" : "opacity-100 scale-100"
       }`}
     >
-      {/* Netflix Cinematic Video with multiple robust fallback sources */}
-      {!videoFailed && (
+      {/* HTML5 Netflix Cinematic MP4 Video */}
+      {!useProceduralFallback && (
         <video
           ref={videoRef}
+          src={candidateSources[currentSourceIndex]}
           playsInline
           autoPlay
           muted={isMuted}
           preload="auto"
-          onCanPlay={() => setVideoLoaded(true)}
-          onPlaying={() => setIsPlaying(true)}
+          onPlaying={() => {
+            setIsPlaying(true);
+            setNeedsUserTap(false);
+          }}
           onTimeUpdate={(e) => {
             const vid = e.currentTarget;
-            if (vid.duration && vid.currentTime >= vid.duration - 0.35) {
+            if (vid.duration && vid.currentTime >= vid.duration - 0.25) {
               handleFinish();
             }
           }}
           onEnded={handleFinish}
-          onError={() => {
-            console.warn("HTML5 video error, engaging synthesized 3D fallback intro");
-            setVideoFailed(true);
-            netflixAudio.playTadum();
-          }}
-          className={`w-full h-full object-contain transition-all duration-500 ${
-            videoLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"
-          }`}
+          onError={handleVideoError}
+          className="w-full h-full object-contain bg-black"
           style={{
             maxHeight: "100vh",
             maxWidth: "100vw",
-            backgroundColor: "#000000",
           }}
-        >
-          {/* 1. Bundled Vite Asset (Highest priority - hashed & relative, guaranteed on GitHub Pages) */}
-          <source src={netflixIntroVideo} type="video/mp4" />
-          {/* 2. Public base-relative URL */}
-          <source src={publicVideoUrl} type="video/mp4" />
-          {/* 3. Direct relative fallback */}
-          <source src="./netflix_intro.mp4" type="video/mp4" />
-          {/* 4. Root fallback */}
-          <source src="/netflix_intro.mp4" type="video/mp4" />
-        </video>
+        />
       )}
 
-      {/* Fallback procedural intro if video cannot decode on device */}
-      {videoFailed && (
+      {/* Synthetic Animated 3D Fallback if video file cannot decode */}
+      {useProceduralFallback && (
         <div className="relative flex flex-col items-center justify-center animate-fadeIn">
           <div className="relative w-28 h-44 flex items-center justify-center">
             {/* Left Bar */}
             <div className="absolute top-0 bottom-0 left-0 w-7 bg-gradient-to-b from-[#b8050e] via-[#E50914] to-[#800006] rounded-xs shadow-[0_0_35px_rgba(229,9,20,0.8)] animate-pulse" />
             {/* Right Bar */}
             <div className="absolute top-0 bottom-0 right-0 w-7 bg-gradient-to-b from-[#b8050e] via-[#E50914] to-[#800006] rounded-xs shadow-[0_0_35px_rgba(229,9,20,0.8)] animate-pulse" />
-            {/* Diagonal Bar */}
+            {/* Diagonal Ribbon */}
             <div
               className="absolute inset-0 z-10 bg-gradient-to-br from-[#ff1e2b] via-[#E50914] to-[#6b0207] shadow-[0_0_45px_rgba(229,9,20,0.9)]"
               style={{
@@ -206,27 +221,27 @@ export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
         </div>
       )}
 
-      {/* Tap to Play prompt if strict mobile browser blocked autoplay */}
-      {needsUserTapToPlay && (
+      {/* Tap to Play prompt if mobile browser blocked initial autoplay */}
+      {needsUserTap && (
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 backdrop-blur-xs">
           <button
-            onClick={handleScreenClick}
+            onClick={handleScreenInteraction}
             type="button"
-            className="flex items-center gap-3 px-6 py-3.5 rounded-full bg-[#E50914] hover:bg-red-600 text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.8)] transition-all hover:scale-105 active:scale-95 animate-pulse"
+            className="flex items-center gap-3 px-6 py-3.5 rounded-full bg-[#E50914] hover:bg-red-600 text-white font-black text-sm tracking-wider uppercase shadow-[0_0_35px_rgba(229,9,20,0.8)] transition-all hover:scale-105 active:scale-95 animate-pulse cursor-pointer"
           >
             <Play className="w-5 h-5 fill-white" />
-            <span>Tap to Play Intro</span>
+            <span>Tap to Play Netflix Intro</span>
           </button>
         </div>
       )}
 
-      {/* Unmute prompt banner if video is playing muted */}
-      {!needsUserTapToPlay && isMuted && isPlaying && (
+      {/* Unmute prompt banner if video is playing in muted mode */}
+      {!needsUserTap && isMuted && isPlaying && (
         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
           <button
             onClick={toggleSound}
             type="button"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 hover:bg-black/95 text-white text-xs border border-red-500/50 backdrop-blur-md shadow-[0_0_20px_rgba(229,9,20,0.4)] transition-all hover:scale-105 active:scale-95 animate-bounce"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/85 hover:bg-black text-white text-xs border border-red-500/60 backdrop-blur-md shadow-[0_0_20px_rgba(229,9,20,0.5)] transition-all hover:scale-105 active:scale-95 animate-bounce cursor-pointer"
           >
             <VolumeX className="w-4 h-4 text-red-500" />
             <span>Tap to unmute sound (TA-DUM)</span>
@@ -240,7 +255,7 @@ export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
           onClick={toggleSound}
           type="button"
           aria-label={isMuted ? "Unmute intro audio" : "Mute intro audio"}
-          className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/15 transition-all text-xs flex items-center gap-1.5 active:scale-95 hover:border-[#E50914]"
+          className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/15 transition-all text-xs flex items-center gap-1.5 active:scale-95 hover:border-[#E50914] cursor-pointer"
         >
           {isMuted ? (
             <VolumeX className="w-4 h-4 text-red-400" />
@@ -252,7 +267,7 @@ export const NetflixIntro: React.FC<NetflixIntroProps> = ({ onComplete }) => {
         <button
           onClick={handleSkip}
           type="button"
-          className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/25 text-white backdrop-blur-md border border-white/20 font-semibold text-xs tracking-wider uppercase transition-all flex items-center gap-1.5 group hover:border-[#E50914] active:scale-95"
+          className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/25 text-white backdrop-blur-md border border-white/20 font-semibold text-xs tracking-wider uppercase transition-all flex items-center gap-1.5 group hover:border-[#E50914] active:scale-95 cursor-pointer"
         >
           <span>Skip Intro</span>
           <FastForward className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-red-400" />

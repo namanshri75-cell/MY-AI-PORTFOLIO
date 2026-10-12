@@ -23,38 +23,13 @@ import { NetflixIntro } from "./components/netflix/NetflixIntro";
 
 export default function App() {
   const [resumeModalOpen, setResumeModalOpen] = useState(false);
-  const [themeMode, setThemeMode] = useState<"classic" | "netflix">(() => {
-    try {
-      const saved = localStorage.getItem("naman_portfolio_theme");
-      return saved === "netflix" ? "netflix" : "classic";
-    } catch {
-      return "classic";
-    }
-  });
+  // Always default to Classic Portfolio on page load/visit as requested
+  const [themeMode, setThemeMode] = useState<"classic" | "netflix">("classic");
   const [showNetflixIntro, setShowNetflixIntro] = useState(false);
 
-  useEffect(() => {
-    try {
-      const search = window.location.search.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-      if (search.includes("netflix") || hash.includes("netflix") || search.includes("intro")) {
-        setThemeMode("netflix");
-        setShowNetflixIntro(true);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
-
   const handleSwitchToNetflix = () => {
-    // Mount Netflix theme underneath immediately so billboard & assets are ready
+    // Mount Netflix theme and trigger cinematic TA-DUM intro
     setThemeMode("netflix");
-    try {
-      localStorage.setItem("naman_portfolio_theme", "netflix");
-    } catch {
-      // ignore
-    }
-    // Show the iconic Netflix TA-DUM intro animation over it
     setShowNetflixIntro(true);
   };
 
@@ -63,17 +38,13 @@ export default function App() {
   };
 
   const handleIntroComplete = () => {
-    // Intro video has smoothly dissolved into the ready Netflix theme
+    // Intro video dissolves into the Netflix theme
     setShowNetflixIntro(false);
   };
 
   const handleSwitchToClassic = () => {
+    setShowNetflixIntro(false);
     setThemeMode("classic");
-    try {
-      localStorage.setItem("naman_portfolio_theme", "classic");
-    } catch {
-      // ignore
-    }
   };
 
   return (
@@ -104,7 +75,10 @@ export default function App() {
 
           {/* Main Content Sections */}
           <main className="flex flex-col w-full">
-            <HeroSection onOpenResumePreview={() => setResumeModalOpen(true)} />
+            <HeroSection
+              onOpenResumePreview={() => setResumeModalOpen(true)}
+              onSwitchToNetflix={handleSwitchToNetflix}
+            />
             <AboutSection />
             <SkillsSection />
             <ProjectsSection />
@@ -125,17 +99,17 @@ export default function App() {
           />
 
           {/* Floating Netflix Theme Switcher Pill */}
-          <div className="fixed bottom-6 right-6 z-40 hidden sm:block">
+          <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 block">
             <button
               onClick={handleSwitchToNetflix}
               type="button"
-              className="px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 via-[#E50914] to-red-700 text-white font-bold text-xs uppercase tracking-wider shadow-[0_4px_25px_rgba(229,9,20,0.6)] hover:shadow-[0_4px_35px_rgba(229,9,20,0.9)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-red-400/40"
+              className="px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 via-[#E50914] to-red-700 text-white font-bold text-xs uppercase tracking-wider shadow-[0_4px_25px_rgba(229,9,20,0.6)] hover:shadow-[0_4px_35px_rgba(229,9,20,0.9)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-red-400/40 cursor-pointer"
               title="Experience Portfolio in Netflix Theme"
             >
               <span className="text-base">🍿</span>
               <span>Netflix Theme</span>
-              <span className="px-1.5 py-0.2 rounded bg-black/40 text-[10px] font-mono font-semibold text-red-200">
-                PRO
+              <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px] font-mono font-semibold text-red-200">
+                TA-DUM
               </span>
             </button>
           </div>

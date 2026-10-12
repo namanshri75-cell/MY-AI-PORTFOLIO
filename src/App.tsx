@@ -20,6 +20,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ScrollProgressBar } from "./components/ScrollProgressBar";
 import { NetflixTheme } from "./components/netflix/NetflixTheme";
 import { NetflixIntro } from "./components/netflix/NetflixIntro";
+import { netflixAudio } from "./utils/netflixAudio";
 
 export default function App() {
   const [resumeModalOpen, setResumeModalOpen] = useState(false);
@@ -43,6 +44,7 @@ export default function App() {
   };
 
   const handleSwitchToClassic = () => {
+    netflixAudio.pauseBgm();
     setShowNetflixIntro(false);
     setThemeMode("classic");
   };

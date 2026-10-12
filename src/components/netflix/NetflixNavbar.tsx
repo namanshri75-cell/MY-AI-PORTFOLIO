@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Bell, ChevronDown, Check, FileDown, ExternalLink, Sparkles, X, Undo2, Clapperboard } from "lucide-react";
+import { Search, Bell, ChevronDown, Check, FileDown, ExternalLink, Sparkles, X, Undo2, Clapperboard, Volume2, Volume1, VolumeX } from "lucide-react";
 import { PERSONAL_INFO } from "../../data/portfolioData";
 import { generateResumePDF } from "../../utils/resumePdf";
 import { netflixAudio } from "../../utils/netflixAudio";
@@ -22,6 +22,26 @@ export const NetflixNavbar: React.FC<NetflixNavbarProps> = ({
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Netflix BGM Soundtrack state (Muted by default per user requirement)
+  const [bgmState, setBgmState] = useState(() => netflixAudio.getBgmState());
+
+  useEffect(() => {
+    const unsub = netflixAudio.subscribe((state) => {
+      setBgmState(state);
+    });
+    return unsub;
+  }, []);
+
+  const handleToggleSound = () => {
+    netflixAudio.playClick();
+    netflixAudio.toggleBgm();
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const vol = parseFloat(e.target.value);
+    netflixAudio.setBgmVolume(vol);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -120,8 +140,95 @@ export const NetflixNavbar: React.FC<NetflixNavbarProps> = ({
           </nav>
         </div>
 
-        {/* Right Side: Search, Notifications, Avatar, Theme Switcher */}
-        <div className="flex items-center gap-3 sm:gap-5">
+        {/* Right Side: Sound Controller, Search, Notifications, Avatar, Theme Switcher */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Netflix Interstellar (Cornfield Chase) Soundtrack & Cool Volume Adjuster (Muted by default) */}
+          <div className="flex items-center">
+            <div
+              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full transition-all duration-300 border ${
+                !bgmState.isMuted
+                  ? "bg-red-950/40 border-[#E50914]/60 shadow-[0_0_18px_rgba(229,9,20,0.35)] ring-1 ring-red-500/20"
+                  : "bg-black/60 border-neutral-800 hover:border-neutral-700 backdrop-blur-md"
+              }`}
+            >
+              {/* Sound Mute/Unmute Toggle Button */}
+              <button
+                onClick={handleToggleSound}
+                type="button"
+                aria-label={bgmState.isMuted ? "Turn on Netflix Soundtrack" : "Mute Netflix Soundtrack"}
+                title={
+                  bgmState.isMuted
+                    ? "Turn on Interstellar (Cornfield Chase) on loop (Muted by default)"
+                    : "Interstellar (Cornfield Chase) playing on loop • Click to Mute"
+                }
+                className={`p-1 rounded-full transition-all flex items-center gap-1 cursor-pointer ${
+                  !bgmState.isMuted
+                    ? "text-[#E50914] hover:scale-110 active:scale-95"
+                    : "text-neutral-400 hover:text-white"
+                }`}
+              >
+                {bgmState.isMuted ? (
+                  <VolumeX className="w-4 h-4 text-neutral-400 hover:text-red-400 transition-colors" />
+                ) : bgmState.volume < 0.35 ? (
+                  <Volume1 className="w-4 h-4 text-[#E50914] animate-pulse" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-[#E50914] animate-pulse" />
+                )}
+
+                {/* Animated visualizer pulse dots when unmuted and playing */}
+                {!bgmState.isMuted && (
+                  <span className="hidden md:flex items-end gap-0.5 h-3 ml-0.5" aria-hidden="true">
+                    <span className="w-0.5 bg-[#E50914] rounded-full animate-bounce h-2" style={{ animationDelay: "0ms" }} />
+                    <span className="w-0.5 bg-[#E50914] rounded-full animate-bounce h-3" style={{ animationDelay: "150ms" }} />
+                    <span className="w-0.5 bg-[#E50914] rounded-full animate-bounce h-1.5" style={{ animationDelay: "300ms" }} />
+                  </span>
+                )}
+              </button>
+
+              {/* Cool Volume Adjuster Slider (Disabled when muted) */}
+              <div
+                className={`flex items-center gap-1.5 transition-all duration-300 ${
+                  bgmState.isMuted
+                    ? "opacity-30 cursor-not-allowed pointer-events-none"
+                    : "opacity-100"
+                }`}
+                title={
+                  bgmState.isMuted
+                    ? "Volume adjuster disabled while muted (Turn on sound to adjust)"
+                    : `Volume: ${Math.round(bgmState.volume * 100)}%`
+                }
+              >
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  disabled={bgmState.isMuted}
+                  value={bgmState.isMuted ? 0 : bgmState.volume}
+                  onChange={handleVolumeChange}
+                  aria-label="Soundtrack Volume Adjuster"
+                  className={`w-14 sm:w-18 md:w-24 h-1.5 rounded-lg appearance-none cursor-pointer transition-all ${
+                    bgmState.isMuted
+                      ? "bg-neutral-800 cursor-not-allowed"
+                      : "bg-neutral-700 accent-[#E50914] hover:accent-red-500"
+                  }`}
+                  style={{
+                    background: bgmState.isMuted
+                      ? "#262626"
+                      : `linear-gradient(to right, #E50914 ${bgmState.volume * 100}%, #404040 ${bgmState.volume * 100}%)`,
+                  }}
+                />
+                <span
+                  className={`text-[10px] font-mono select-none min-w-[26px] text-right font-semibold ${
+                    bgmState.isMuted ? "text-neutral-600" : "text-neutral-300"
+                  }`}
+                >
+                  {bgmState.isMuted ? "OFF" : `${Math.round(bgmState.volume * 100)}%`}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Interactive Search Bar */}
           <div className="relative flex items-center">
             {searchOpen ? (
@@ -266,6 +373,50 @@ export const NetflixNavbar: React.FC<NetflixNavbarProps> = ({
                     <span>GitHub Repositories</span>
                     <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
                   </a>
+
+                  {/* Interstellar (Cornfield Chase) Soundtrack Toggle & Volume Slider */}
+                  <div className="flex flex-col gap-1.5 p-2 rounded bg-neutral-900/80 border border-neutral-800">
+                    <button
+                      onClick={() => {
+                        handleToggleSound();
+                      }}
+                      type="button"
+                      className="w-full text-left rounded flex items-center justify-between text-xs cursor-pointer"
+                    >
+                      <span className="flex items-center gap-1.5 font-medium">
+                        {bgmState.isMuted ? (
+                          <VolumeX className="w-3.5 h-3.5 text-neutral-400" />
+                        ) : (
+                          <Volume2 className="w-3.5 h-3.5 text-[#E50914] animate-pulse" />
+                        )}
+                        <span>Soundtrack (Cornfield Chase)</span>
+                      </span>
+                      <span className="text-[10px] font-mono font-semibold text-[#E50914]">
+                        {bgmState.isMuted ? "MUTED" : `${Math.round(bgmState.volume * 100)}%`}
+                      </span>
+                    </button>
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        disabled={bgmState.isMuted}
+                        value={bgmState.isMuted ? 0 : bgmState.volume}
+                        onChange={handleVolumeChange}
+                        aria-label="Mobile Soundtrack Volume Adjuster"
+                        className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer transition-all ${
+                          bgmState.isMuted ? "bg-neutral-800 opacity-30 cursor-not-allowed pointer-events-none" : "accent-[#E50914]"
+                        }`}
+                        style={{
+                          background: bgmState.isMuted
+                            ? "#262626"
+                            : `linear-gradient(to right, #E50914 ${bgmState.volume * 100}%, #404040 ${bgmState.volume * 100}%)`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
                   {onReplayIntro && (
                     <button
                       onClick={() => {

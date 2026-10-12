@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Play, Info, Plus, Check, Volume2, VolumeX, Sparkles, Layers } from "lucide-react";
+import { Play, Info, Plus, Check, Sparkles, Layers } from "lucide-react";
 import { NetflixPoster } from "./NetflixPosters";
 import { NetflixTitleItem } from "./NetflixModal";
 import { netflixAudio } from "../../utils/netflixAudio";
@@ -19,14 +19,7 @@ export const NetflixBillboard: React.FC<NetflixBillboardProps> = ({
   isInMyList,
   onToggleMyList,
 }) => {
-  const [muted, setMuted] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
-  const toggleSound = () => {
-    const next = !muted;
-    setMuted(next);
-    netflixAudio.setMuted(next);
-  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -234,18 +227,9 @@ export const NetflixBillboard: React.FC<NetflixBillboardProps> = ({
         </div>
       </div>
 
-      {/* Right Edge Maturity & Audio Rating Tab */}
-      <div className="absolute bottom-6 sm:bottom-10 right-0 z-20 flex items-center gap-3 pr-4 sm:pr-10">
-        <button
-          onClick={toggleSound}
-          type="button"
-          aria-label={muted ? "Unmute audio" : "Mute audio"}
-          className="p-2.5 rounded-full border border-neutral-500 bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-colors"
-        >
-          {muted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4" />}
-        </button>
-
-        <div className="bg-neutral-900/80 border-l-2 border-white px-3.5 py-1 text-xs font-mono font-bold text-neutral-300">
+      {/* Right Edge Maturity Rating Tab */}
+      <div className="absolute bottom-6 sm:bottom-10 right-0 z-20 flex items-center pr-4 sm:pr-10">
+        <div className="bg-neutral-900/80 border-l-2 border-[#E50914] px-3.5 py-1 text-xs font-mono font-bold text-neutral-300 backdrop-blur-md shadow-lg">
           TV-MA • AI OPERATIONS
         </div>
       </div>

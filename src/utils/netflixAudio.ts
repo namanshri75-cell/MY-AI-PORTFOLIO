@@ -1,17 +1,45 @@
+import { resolvePublicAsset } from "./resolveAsset";
+import interstellarCornchaseMp3 from "../assets/interstellar_cornchase.mp3";
+
 /**
- * Web Audio API synthesized Netflix-style "TA-DUM" sound effect and UI feedback
- * Pure client-side synthesis: zero external audio files, 100% reliable, zero network latency.
+ * Web Audio API synthesized Netflix-style "TA-DUM" sound effect, UI clicks,
+ * and cinematic looped Interstellar (Cornfield Chase) BGM soundtrack engine.
  */
+
+type AudioStateListener = (state: { isMuted: boolean; volume: number; isPlaying: boolean }) => void;
 
 class NetflixAudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
 
+  // Background Soundtrack (Interstellar - Cornfield Chase)
+  private bgmAudio: HTMLAudioElement | null = null;
+  private bgmMuted: boolean = true; // Muted by default on visit as requested
+  private bgmVolume: number = 0.75;
+  private bgmPlaying: boolean = false;
+  private listeners: Set<AudioStateListener> = new Set();
+  private candidateIndex: number = 0;
+
+  private getAudioSources(): string[] {
+    const list = [
+      interstellarCornchaseMp3,
+      resolvePublicAsset("audio/interstellar_cornchase.mp3"),
+      "./audio/interstellar_cornchase.mp3",
+      "/audio/interstellar_cornchase.mp3",
+      resolvePublicAsset("audio/interstellar_cornfield_chase.mp3"),
+      "./audio/interstellar_cornfield_chase.mp3",
+    ];
+    // Filter duplicates
+    return Array.from(new Set(list.filter(Boolean)));
+  }
+
   private getContext(): AudioContext | null {
     if (typeof window === "undefined") return null;
     try {
       if (!this.ctx) {
-        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         this.ctx = new AudioContextClass();
       }
       if (this.ctx.state === "suspended") {
@@ -32,11 +60,175 @@ class NetflixAudioEngine {
     return this.isMuted;
   }
 
+  // ==========================================
+  // BACKGROUND MUSIC ENGINE (STRANGER THINGS)
+  // ==========================================
+
+  private getOrInitBgmAudio(): HTMLAudioElement | null {
+    if (typeof window === "undefined") return null;
+    if (this.bgmAudio) return this.bgmAudio;
+
+    try {
+      const sources = this.getAudioSources();
+      const initialSrc = sources[this.candidateIndex] || sources[0];
+      const audio = new Audio(initialSrc);
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.volume = this.bgmVolume;
+      audio.muted = this.bgmMuted;
+
+      audio.addEventListener("play", () => {
+        this.bgmPlaying = true;
+        this.notify();
+      });
+
+      audio.addEventListener("pause", () => {
+        this.bgmPlaying = false;
+        this.notify();
+      });
+
+      audio.addEventListener("error", () => {
+        const nextIdx = this.candidateIndex + 1;
+        if (nextIdx < sources.length) {
+          this.candidateIndex = nextIdx;
+          const nextSrc = sources[nextIdx];
+          console.warn(`Audio fallback: trying source [${nextIdx}]: ${nextSrc}`);
+          audio.src = nextSrc;
+          audio.load();
+          if (!this.bgmMuted) {
+            audio.play().catch(() => {});
+          }
+        } else {
+          console.warn("All Interstellar audio sources failed to load.");
+        }
+      });
+
+      this.bgmAudio = audio;
+      return audio;
+    } catch (e) {
+      console.warn("BGM initialization failed:", e);
+      return null;
+    }
+  }
+
+  public subscribe(listener: AudioStateListener): () => void {
+    this.listeners.add(listener);
+    // Send current initial state
+    listener(this.getBgmState());
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private notify() {
+    const state = this.getBgmState();
+    this.listeners.forEach((listener) => {
+      try {
+        listener(state);
+      } catch (e) {
+        console.warn("Listener notification failed:", e);
+      }
+    });
+  }
+
+  public getBgmState() {
+    return {
+      isMuted: this.bgmMuted,
+      volume: this.bgmVolume,
+      isPlaying: this.bgmPlaying && !this.bgmMuted,
+    };
+  }
+
+  public getBgmMuted(): boolean {
+    return this.bgmMuted;
+  }
+
+  public getBgmVolume(): number {
+    return this.bgmVolume;
+  }
+
+  public async playBgm(): Promise<void> {
+    const audio = this.getOrInitBgmAudio();
+    if (!audio) return;
+
+    this.bgmMuted = false;
+    audio.muted = false;
+    audio.volume = this.bgmVolume;
+
+    try {
+      await audio.play();
+      this.bgmPlaying = true;
+    } catch (e) {
+      console.warn("Autoplay was blocked until user interaction:", e);
+      // Wait for next user gesture
+    }
+    this.notify();
+  }
+
+  public pauseBgm(): void {
+    const audio = this.getOrInitBgmAudio();
+    if (audio) {
+      audio.pause();
+    }
+    this.bgmPlaying = false;
+    this.bgmMuted = true;
+    if (audio) {
+      audio.muted = true;
+    }
+    this.notify();
+  }
+
+  public async toggleBgm(): Promise<boolean> {
+    const audio = this.getOrInitBgmAudio();
+    if (!audio) return false;
+
+    if (this.bgmMuted || audio.paused) {
+      // Unmute and play on loop
+      this.bgmMuted = false;
+      audio.muted = false;
+      audio.volume = this.bgmVolume;
+      try {
+        await audio.play();
+        this.bgmPlaying = true;
+      } catch (err) {
+        console.warn("Audio play prevented:", err);
+      }
+    } else {
+      // Mute and pause
+      this.bgmMuted = true;
+      audio.muted = true;
+      audio.pause();
+      this.bgmPlaying = false;
+    }
+
+    this.notify();
+    return !this.bgmMuted;
+  }
+
+  public setBgmVolume(vol: number): void {
+    const clamped = Math.max(0, Math.min(1, vol));
+    this.bgmVolume = clamped;
+    const audio = this.getOrInitBgmAudio();
+    if (audio) {
+      audio.volume = clamped;
+    }
+    // If volume is adjusted above 0 while unmuted
+    if (clamped === 0 && !this.bgmMuted) {
+      this.bgmMuted = true;
+      if (audio) audio.muted = true;
+    } else if (clamped > 0 && this.bgmMuted && audio && !audio.paused) {
+      this.bgmMuted = false;
+      if (audio) audio.muted = false;
+    }
+    this.notify();
+  }
+
+  // ==========================================
+  // CINEMATIC SFX SYNTHESIS
+  // ==========================================
+
   /**
    * Synthesize the iconic cinematic Netflix "TA-DUM" sound.
-   * Two primary impacts:
-   * 1. Initial deep cinematic sub-bass punch (~65Hz) with quick transient
-   * 2. The resonant signature metallic/orchestral chime hit (~130Hz expanding with harmonic overtone shimmer)
    */
   public playTadum() {
     if (this.isMuted) return;
@@ -66,10 +258,9 @@ class NetflixAudioEngine {
       taOsc.start(now);
       taOsc.stop(now + 0.45);
 
-      // --- HIT 2: "DUM" (The massive iconic orchestral bass slam + harmonic shimmer) ---
-      const dumTime = now + 0.22; // delayed strike
+      // --- HIT 2: "DUM" ---
+      const dumTime = now + 0.22;
 
-      // 2A. Deep sub-bass foundation
       const subOsc = ctx.createOscillator();
       const subGain = ctx.createGain();
       subOsc.type = "sine";
@@ -85,13 +276,12 @@ class NetflixAudioEngine {
       subOsc.start(dumTime);
       subOsc.stop(dumTime + 2.5);
 
-      // 2B. Resonant saw/triangle timbre representing the cello/timpani body
       const bodyOsc = ctx.createOscillator();
       const bodyFilter = ctx.createBiquadFilter();
       const bodyGain = ctx.createGain();
 
       bodyOsc.type = "sawtooth";
-      bodyOsc.frequency.setValueAtTime(116.54, dumTime); // B-flat note vibe
+      bodyOsc.frequency.setValueAtTime(116.54, dumTime);
       bodyFilter.type = "lowpass";
       bodyFilter.frequency.setValueAtTime(500, dumTime);
       bodyFilter.frequency.exponentialRampToValueAtTime(90, dumTime + 1.5);
@@ -107,13 +297,12 @@ class NetflixAudioEngine {
       bodyOsc.start(dumTime);
       bodyOsc.stop(dumTime + 2.3);
 
-      // 2C. Shimmering high harmonic anvil/chime (the metallic texture)
       const shimmerOsc = ctx.createOscillator();
       const shimmerFilter = ctx.createBiquadFilter();
       const shimmerGain = ctx.createGain();
 
       shimmerOsc.type = "triangle";
-      shimmerOsc.frequency.setValueAtTime(466.16, dumTime); // Bb4
+      shimmerOsc.frequency.setValueAtTime(466.16, dumTime);
       shimmerFilter.type = "bandpass";
       shimmerFilter.frequency.setValueAtTime(900, dumTime);
       shimmerFilter.Q.setValueAtTime(6, dumTime);

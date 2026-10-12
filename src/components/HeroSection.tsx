@@ -7,10 +7,9 @@ import { generateResumePDF } from "../utils/resumePdf";
 
 interface HeroSectionProps {
   onOpenResumePreview?: () => void;
-  onSwitchToNetflix?: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResumePreview, onSwitchToNetflix }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResumePreview }) => {
   const [active3DMode, setActive3DMode] = useState<"neural" | "robot">("neural");
 
   const scrollToSection = (id: string) => {
@@ -77,8 +76,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResumePreview, o
               Exploring practical applications of AI and automation to simplify workflows, solve problems, and build useful digital experiences.
             </p>
 
-            {/* Four Action Buttons */}
-            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 mb-8 w-full sm:w-auto">
+            {/* Three Action Buttons */}
+            <div className="flex flex-col min-[480px]:flex-row items-stretch min-[480px]:items-center gap-3 mb-8 w-full sm:w-auto">
               {/* Button 1: View My Work */}
               <button
                 onClick={() => scrollToSection("projects")}
@@ -88,22 +87,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResumePreview, o
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
-              {/* Button 2: Netflix Theme Interactive Showcase */}
-              {onSwitchToNetflix && (
-                <button
-                  onClick={onSwitchToNetflix}
-                  className="px-5 sm:px-6 py-3 min-h-[46px] rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-red-600 via-[#E50914] to-red-700 text-white hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(229,9,20,0.45)] border border-red-500/40 hover:scale-105"
-                  title="Switch to Netflix Streaming Portfolio Theme"
-                >
-                  <span className="text-base">🍿</span>
-                  <span>Netflix Theme</span>
-                  <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px] font-mono font-semibold text-red-200">
-                    TA-DUM
-                  </span>
-                </button>
-              )}
-
-              {/* Button 3: Download Resume */}
+              {/* Button 2: Download Resume */}
               <button
                 onClick={() => {
                   generateResumePDF();
@@ -114,7 +98,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenResumePreview, o
                 <span>Resume PDF</span>
               </button>
 
-              {/* Button 4: Subtle Contact Me */}
+              {/* Button 3: Subtle Contact Me */}
               <button
                 onClick={() => scrollToSection("contact")}
                 className="px-4 py-3 min-h-[46px] rounded-xl font-medium text-xs sm:text-sm text-slate-400 hover:text-white hover:bg-white/[0.04] border border-transparent hover:border-white/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"

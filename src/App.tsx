@@ -75,10 +75,7 @@ export default function App() {
 
           {/* Main Content Sections */}
           <main className="flex flex-col w-full">
-            <HeroSection
-              onOpenResumePreview={() => setResumeModalOpen(true)}
-              onSwitchToNetflix={handleSwitchToNetflix}
-            />
+            <HeroSection onOpenResumePreview={() => setResumeModalOpen(true)} />
             <AboutSection />
             <SkillsSection />
             <ProjectsSection />
@@ -97,22 +94,6 @@ export default function App() {
             isOpen={resumeModalOpen}
             onClose={() => setResumeModalOpen(false)}
           />
-
-          {/* Floating Netflix Theme Switcher Pill */}
-          <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 block">
-            <button
-              onClick={handleSwitchToNetflix}
-              type="button"
-              className="px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 via-[#E50914] to-red-700 text-white font-bold text-xs uppercase tracking-wider shadow-[0_4px_25px_rgba(229,9,20,0.6)] hover:shadow-[0_4px_35px_rgba(229,9,20,0.9)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-red-400/40 cursor-pointer"
-              title="Experience Portfolio in Netflix Theme"
-            >
-              <span className="text-base">🍿</span>
-              <span>Netflix Theme</span>
-              <span className="px-1.5 py-0.5 rounded bg-black/40 text-[10px] font-mono font-semibold text-red-200">
-                TA-DUM
-              </span>
-            </button>
-          </div>
         </div>
       )}
     </ErrorBoundary>

@@ -1,3 +1,14 @@
+export interface ProjectMilestone {
+  step: string;
+  title: string;
+  phase: string;
+  status: "completed" | "verified" | "live";
+  description: string;
+  automationOutcome: string;
+  toolsUsed: string[];
+  metrics: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -10,6 +21,7 @@ export interface Project {
   githubUrl?: string;
   status: string;
   interactiveType?: "nexa" | "excel" | "social" | "local_ai";
+  milestones?: ProjectMilestone[];
 }
 
 export interface SkillItem {

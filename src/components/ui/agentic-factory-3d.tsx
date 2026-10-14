@@ -1139,14 +1139,14 @@ function initMachineScene(
     function setCameraGoal() {
       const expand = mode === 'stations' ? 1.2 : 1
       if (cameraMode === 'station') {
-        const s = stations.find((s) => s.id === selected)!
+        const s = stations.find((s) => s.id === selected) || stations[0]
         desiredTarget.copy(s.group.position).add(new THREE.Vector3(0, 1.25, 0))
         desiredPosition.copy(desiredTarget).addScaledVector(viewDirection, mobile ? 9 : 12)
       } else {
         desiredTarget.set(0, 1, 0)
         const distance = baseDistance * expand
         if (cameraMode === 'side')
-          desiredPosition.set(13, 5, 20).normalize().multiplyScalar(distance).add(desiredTarget)
+          desiredPosition.set(20, 5, 2).normalize().multiplyScalar(distance).add(desiredTarget)
         else if (cameraMode === 'top') desiredPosition.set(0.01, distance, 0.8).add(desiredTarget)
         else desiredPosition.copy(viewDirection).multiplyScalar(distance).add(desiredTarget)
       }
@@ -1430,6 +1430,20 @@ function initMachineScene(
           prevJourney = step
         }
         $('journey-progress').style.width = packet.phase * 100 + '%'
+      }
+      if (cameraMode === 'flight') {
+        const rad = flightTime * 0.35
+        const dist = baseDistance * (mode === 'stations' ? 1.25 : 1.05)
+        camera.position.set(Math.cos(rad) * dist, 6.5 + Math.sin(rad * 0.5) * 2, Math.sin(rad) * dist)
+        controls.target.set(0, 1, 0)
+      } else if (cameraAnimating) {
+        camera.position.lerp(desiredPosition, Math.min(1, dt * 5.5))
+        controls.target.lerp(desiredTarget, Math.min(1, dt * 5.5))
+        if (camera.position.distanceTo(desiredPosition) < 0.05 && controls.target.distanceTo(desiredTarget) < 0.05) {
+          camera.position.copy(desiredPosition)
+          controls.target.copy(desiredTarget)
+          cameraAnimating = false
+        }
       }
       controls.update(dt)
       stations.forEach((s, i) => {

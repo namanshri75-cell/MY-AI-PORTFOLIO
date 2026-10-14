@@ -92,7 +92,7 @@ export const SublevelUtilityDock: React.FC<SublevelUtilityDockProps> = ({
             onClick={() => scrollTo("lab")}
             className="px-2.5 py-1.5 rounded-none hover:bg-neutral-800/60 text-neutral-300 hover:text-amber-300 transition-all cursor-pointer whitespace-nowrap hidden lg:inline-flex"
           >
-            [07] LAB
+            [07] WORKFLOW
           </button>
           <button
             onClick={() => scrollTo("contact")}

@@ -23,13 +23,16 @@ class NetflixAudioEngine {
   private getAudioSources(): string[] {
     const list = [
       interstellarCornchaseMp3,
+      resolvePublicAsset("interstellar_cornchase.mp3"),
       resolvePublicAsset("audio/interstellar_cornchase.mp3"),
+      "./interstellar_cornchase.mp3",
       "./audio/interstellar_cornchase.mp3",
+      "/interstellar_cornchase.mp3",
       "/audio/interstellar_cornchase.mp3",
       resolvePublicAsset("audio/interstellar_cornfield_chase.mp3"),
       "./audio/interstellar_cornfield_chase.mp3",
     ];
-    // Filter duplicates
+    // Filter duplicates and valid non-empty strings
     return Array.from(new Set(list.filter(Boolean)));
   }
 
@@ -191,7 +194,19 @@ class NetflixAudioEngine {
         await audio.play();
         this.bgmPlaying = true;
       } catch (err) {
-        console.warn("Audio play prevented:", err);
+        console.warn("Audio play prevented on primary source, trying next candidate:", err);
+        const sources = this.getAudioSources();
+        if (this.candidateIndex + 1 < sources.length) {
+          this.candidateIndex++;
+          audio.src = sources[this.candidateIndex];
+          audio.load();
+          try {
+            await audio.play();
+            this.bgmPlaying = true;
+          } catch (e2) {
+            console.warn("Audio fallback playback failed:", e2);
+          }
+        }
       }
     } else {
       // Mute and pause

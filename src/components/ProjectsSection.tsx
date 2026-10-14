@@ -80,24 +80,24 @@ export const ProjectsSection: React.FC = () => {
   };
 
   return (
-    <section id="projects" className="relative py-20 lg:py-28 w-full border-t border-slate-900 bg-[#07090e]">
+    <section id="projects" className="relative py-20 lg:py-28 w-full border-t border-amber-500/20 bg-[#040406]">
       {/* Background Ambience */}
-      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-amber-500/5 rounded-none blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bespoke-pill text-cyan-400 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>AI PROTOTYPING & CONCEPTS</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bespoke-pill text-amber-300 mb-3 border-amber-500/30">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="font-mono text-xs uppercase tracking-widest">[SYS/03] MODULAR PROJECT CELLS</span>
           </div>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
             FEATURED PROJECTS
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-slate-300/80 max-w-2xl font-normal">
+          <p className="mt-3 text-sm sm:text-base text-neutral-300 max-w-2xl font-normal">
             Hands-on explorations turning AI tools and automation into practical digital experiences.
           </p>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-full mt-4" />
+          <div className="w-20 h-0.5 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 rounded-none mt-4" />
         </div>
 
         {/* Project Cards Grid */}
@@ -105,60 +105,62 @@ export const ProjectsSection: React.FC = () => {
           {PROJECTS.map((project, idx) => (
             <div
               key={project.id}
-              className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bespoke-card transition-all duration-300 flex flex-col justify-between group shadow-xl"
+              className="p-5 sm:p-8 rounded-none bespoke-card transition-all duration-300 flex flex-col justify-between group shadow-xl border border-amber-500/25 hover:border-amber-400"
             >
               <div>
                 {/* Header tags */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                    <span className="text-xs font-mono text-cyan-400 font-semibold tracking-wider uppercase">
+                    <span className="text-[10.5px] font-mono px-2 py-0.5 rounded-none bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold">
+                      [CELL/0{idx + 1}]
+                    </span>
+                    <span className="text-xs font-mono text-neutral-300 font-semibold tracking-wider uppercase">
                       {project.category}
                     </span>
                   </div>
-                  <span className="bespoke-pill px-2.5 py-1 rounded-full text-slate-300 text-[11px] sm:text-xs">
+                  <span className="bespoke-pill px-2.5 py-1 rounded-none text-amber-300 border-amber-500/30 text-[11px] sm:text-xs">
                     {project.status}
                   </span>
                 </div>
 
                 {/* Title & Tagline */}
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors mb-2 tracking-tight">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-white group-hover:text-amber-300 transition-colors mb-2 tracking-tight">
                   {project.title}
                 </h3>
-                <p className="text-xs sm:text-[14.5px] font-normal text-slate-300/90 mb-4 leading-relaxed font-sans">
+                <p className="text-xs sm:text-[14.5px] font-normal text-neutral-300 mb-4 leading-relaxed font-sans">
                   "{project.description}"
                 </p>
 
                 {/* Problem Explored */}
-                <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bespoke-inset mb-3">
-                  <span className="text-[10.5px] font-mono uppercase tracking-wider text-cyan-400 font-bold block mb-1">
+                <div className="p-3.5 sm:p-4 rounded-none bespoke-inset mb-3 border-amber-500/15">
+                  <span className="text-[10.5px] font-mono uppercase tracking-wider text-amber-400 font-bold block mb-1">
                     Problem Explored
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                  <p className="text-xs text-neutral-300 leading-relaxed font-sans">
                     {project.problemExplored}
                   </p>
                 </div>
 
                 {/* My Contribution */}
-                <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bespoke-inset mb-5">
-                  <span className="text-[10.5px] font-mono uppercase tracking-wider text-slate-400 font-bold block mb-1">
+                <div className="p-3.5 sm:p-4 rounded-none bespoke-inset mb-5 border-amber-500/15">
+                  <span className="text-[10.5px] font-mono uppercase tracking-wider text-amber-400/80 font-bold block mb-1">
                     Naman's Contribution
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                  <p className="text-xs text-neutral-300 leading-relaxed font-sans">
                     {project.myContribution}
                   </p>
                 </div>
 
                 {/* Tech Pills */}
                 <div className="mb-6">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 block mb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block mb-2">
                     Technologies & Concepts
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {project.technologies.map((t) => (
                       <span
                         key={t}
-                        className="bespoke-pill px-2.5 py-1 rounded-lg text-slate-300 text-[11px] sm:text-xs"
+                        className="bespoke-pill px-2.5 py-1 rounded-none text-neutral-300 text-[11px] sm:text-xs border-amber-500/20"
                       >
                         {t}
                       </span>
@@ -168,12 +170,12 @@ export const ProjectsSection: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between gap-3">
+              <div className="pt-4 border-t border-amber-500/15 flex items-center justify-between gap-3">
                 <button
                   onClick={() => setActiveModalProject(project)}
-                  className="px-3.5 sm:px-4 py-2.5 min-h-[44px] rounded-xl text-xs font-mono font-medium bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 hover:bg-cyan-500/25 transition-all flex items-center gap-2 cursor-pointer shadow-sm tracking-wide active:scale-95"
+                  className="px-3.5 sm:px-4 py-2.5 min-h-[44px] rounded-none text-xs font-mono font-bold bg-amber-400 text-black hover:bg-amber-300 transition-all flex items-center gap-2 cursor-pointer shadow-sm tracking-wide active:scale-95 border border-amber-300/40"
                 >
-                  <Play className="w-3.5 h-3.5 fill-cyan-300" />
+                  <Play className="w-3.5 h-3.5 fill-black" />
                   <span>Interactive Concept Demo</span>
                 </button>
 
@@ -182,7 +184,7 @@ export const ProjectsSection: React.FC = () => {
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.08] hover:border-white/20 transition-all active:scale-95"
+                    className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-none bg-[#09090c] text-neutral-400 hover:text-amber-300 border border-amber-500/20 hover:border-amber-400 transition-all active:scale-95"
                     aria-label={`View ${project.title} on GitHub`}
                   >
                     <Github className="w-4 h-4" />

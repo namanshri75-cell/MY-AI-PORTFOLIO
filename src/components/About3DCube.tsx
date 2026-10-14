@@ -44,9 +44,9 @@ export const About3DCube: React.FC = () => {
       name: "AI",
       subtitle: "Cognitive Logic",
       icon: Sparkles,
-      color: "text-cyan-400",
-      borderColor: "border-cyan-500/40",
-      glow: "shadow-[0_0_25px_rgba(0,255,198,0.15)]",
+      color: "text-amber-400",
+      borderColor: "border-amber-500/40",
+      glow: "shadow-[0_0_25px_rgba(212,175,55,0.2)]",
       transform: "translateZ(105px)",
       tag: "CORE_PILLAR"
     },
@@ -54,9 +54,9 @@ export const About3DCube: React.FC = () => {
       name: "Automation",
       subtitle: "Process Engines",
       icon: Cpu,
-      color: "text-emerald-400",
-      borderColor: "border-emerald-500/40",
-      glow: "shadow-[0_0_25px_rgba(16,185,129,0.15)]",
+      color: "text-yellow-400",
+      borderColor: "border-amber-400/40",
+      glow: "shadow-[0_0_25px_rgba(212,175,55,0.2)]",
       transform: "rotateY(180deg) translateZ(105px)",
       tag: "PIPELINES"
     },
@@ -64,9 +64,9 @@ export const About3DCube: React.FC = () => {
       name: "LLMs",
       subtitle: "Contextual Models",
       icon: Bot,
-      color: "text-purple-400",
-      borderColor: "border-purple-500/40",
-      glow: "shadow-[0_0_25px_rgba(168,85,247,0.15)]",
+      color: "text-amber-300",
+      borderColor: "border-amber-500/40",
+      glow: "shadow-[0_0_25px_rgba(212,175,55,0.2)]",
       transform: "rotateY(90deg) translateZ(105px)",
       tag: "PROMPTS"
     },
@@ -74,9 +74,9 @@ export const About3DCube: React.FC = () => {
       name: "Workflows",
       subtitle: "Event Automation",
       icon: Workflow,
-      color: "text-blue-400",
-      borderColor: "border-blue-500/40",
-      glow: "shadow-[0_0_25px_rgba(59,130,246,0.15)]",
+      color: "text-amber-400",
+      borderColor: "border-amber-500/40",
+      glow: "shadow-[0_0_25px_rgba(212,175,55,0.2)]",
       transform: "rotateY(-90deg) translateZ(105px)",
       tag: "N8N_ORCHESTRATION"
     },
@@ -84,9 +84,9 @@ export const About3DCube: React.FC = () => {
       name: "APIs",
       subtitle: "REST & Webhooks",
       icon: Network,
-      color: "text-amber-400",
+      color: "text-amber-300",
       borderColor: "border-amber-500/40",
-      glow: "shadow-[0_0_25px_rgba(245,158,11,0.15)]",
+      glow: "shadow-[0_0_25px_rgba(212,175,55,0.2)]",
       transform: "rotateX(90deg) translateZ(105px)",
       tag: "JSON_PAYLOADS"
     },
@@ -94,9 +94,9 @@ export const About3DCube: React.FC = () => {
       name: "AI Assistants",
       subtitle: "Conversational UX",
       icon: Layers,
-      color: "text-teal-400",
-      borderColor: "border-teal-500/40",
-      glow: "shadow-[0_0_25px_rgba(20,184,166,0.15)]",
+      color: "text-yellow-300",
+      borderColor: "border-amber-500/40",
+      glow: "shadow-[0_0_25px_rgba(212,175,55,0.2)]",
       transform: "rotateX(-90deg) translateZ(105px)",
       tag: "USER_AGENTS"
     },
@@ -104,7 +104,7 @@ export const About3DCube: React.FC = () => {
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 backdrop-blur-xl shadow-2xl overflow-hidden group select-none touch-pan-y"
+      className="relative flex flex-col items-center justify-center p-5 sm:p-8 rounded-none bg-gradient-to-b from-[#09090c] to-[#040406] border border-amber-500/30 backdrop-blur-xl shadow-2xl overflow-hidden group select-none touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
@@ -112,17 +112,17 @@ export const About3DCube: React.FC = () => {
       onTouchEnd={handleTouchEnd}
     >
       {/* Subtle background ambient blur */}
-      <div className="absolute -top-12 -right-12 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-none blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-yellow-600/10 rounded-none blur-3xl pointer-events-none" />
 
       <div className="w-full flex items-center justify-between mb-6 sm:mb-8 z-10">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="text-[11px] sm:text-xs font-mono tracking-widest text-slate-400 uppercase">
+          <span className="w-2 h-2 rounded-none bg-amber-400 animate-pulse" />
+          <span className="text-[11px] sm:text-xs font-mono tracking-widest text-neutral-400 uppercase">
             Interactive Concept Matrix
           </span>
         </div>
-        <span className="text-[10px] sm:text-[11px] font-mono text-cyan-300 bg-slate-800/70 px-2 py-0.5 rounded border border-cyan-500/30">
+        <span className="text-[10px] sm:text-[11px] font-mono text-amber-300 bg-black/80 px-2 py-0.5 rounded-none border border-amber-500/40">
           TOUCH / DRAG
         </span>
       </div>
@@ -145,30 +145,30 @@ export const About3DCube: React.FC = () => {
               <div
                 key={face.name}
                 onClick={() => setActiveFace(face.name)}
-                className={`absolute inset-0 p-4 rounded-2xl bg-slate-900/85 backdrop-blur-md border ${face.borderColor} ${face.glow} flex flex-col items-center justify-between cursor-pointer transition-all duration-300 hover:bg-slate-800/95`}
+                className={`absolute inset-0 p-4 rounded-none bg-[#09090c]/90 backdrop-blur-md border ${face.borderColor} ${face.glow} flex flex-col items-center justify-between cursor-pointer transition-all duration-300 hover:bg-neutral-900/95`}
                 style={{
                   transform: face.transform,
                   backfaceVisibility: "visible",
                 }}
               >
-                <div className="w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <div className="w-full flex items-center justify-between text-[10px] font-mono text-neutral-400">
                   <span>{face.tag}</span>
-                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-400/60" />
+                  <div className="w-1.5 h-1.5 rounded-none bg-amber-400/80" />
                 </div>
 
                 <div className="flex flex-col items-center text-center gap-1.5 my-auto">
-                  <div className={`p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/50 ${face.color}`}>
+                  <div className={`p-2.5 rounded-none bg-black/80 border border-amber-500/30 ${face.color}`}>
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <span className="font-bold text-base tracking-wide text-white">
                     {face.name}
                   </span>
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-neutral-400 font-medium">
                     {face.subtitle}
                   </span>
                 </div>
 
-                <div className="w-full text-center text-[10px] font-mono text-slate-400/80 border-t border-slate-800/80 pt-1">
+                <div className="w-full text-center text-[10px] font-mono text-amber-400/80 border-t border-amber-500/20 pt-1">
                   PRACTICAL APPLICATION
                 </div>
               </div>
@@ -179,7 +179,7 @@ export const About3DCube: React.FC = () => {
 
       {/* Quick Interactive Tags selector */}
       <div className="w-full mt-6 z-10">
-        <div className="text-xs font-mono text-slate-400 mb-2.5 text-center">
+        <div className="text-xs font-mono text-neutral-400 mb-2.5 text-center">
           Tap label to orient:
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2">
@@ -195,10 +195,10 @@ export const About3DCube: React.FC = () => {
                 else if (i === 4) { setRotX(-90); setRotY(0); }
                 else if (i === 5) { setRotX(90); setRotY(0); }
               }}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+              className={`px-2.5 py-1 rounded-none text-xs font-mono transition-all border cursor-pointer ${
                 activeFace === f.name
-                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/60 shadow-[0_0_12px_rgba(0,255,198,0.2)]"
-                  : "bg-slate-800/60 text-slate-400 border-slate-700/50 hover:text-white hover:border-slate-600"
+                  ? "bg-amber-400 text-black border-amber-300 font-bold shadow-[0_0_12px_rgba(212,175,55,0.4)]"
+                  : "bg-[#09090c] text-neutral-400 border-amber-500/20 hover:text-white hover:border-amber-400/40"
               }`}
             >
               {f.name}

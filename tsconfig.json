@@ -17,6 +17,9 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "paths": {
+      "@designcodeio/threeui": [
+        "./src/shaders/landing-pages/SublevelStudioLandingPage.tsx"
+      ],
       "@/*": [
         "./*"
       ]

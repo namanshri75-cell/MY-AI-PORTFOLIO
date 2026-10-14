@@ -18,19 +18,38 @@ import { Footer } from "./components/Footer";
 import { ResumeModal } from "./components/ResumeModal";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ScrollProgressBar } from "./components/ScrollProgressBar";
+import { SublevelUtilityDock } from "./components/SublevelUtilityDock";
+import { LabExperimentsSection } from "./components/LabExperimentsSection";
 import { NetflixTheme } from "./components/netflix/NetflixTheme";
 import { NetflixIntro } from "./components/netflix/NetflixIntro";
 import { netflixAudio } from "./utils/netflixAudio";
 
 export default function App() {
   const [resumeModalOpen, setResumeModalOpen] = useState(false);
-  // Always default to Classic Portfolio on page load/visit as requested
-  const [themeMode, setThemeMode] = useState<"classic" | "netflix">("classic");
+  // Check URL param ?theme=netflix or persisted selection
+  const [themeMode, setThemeMode] = useState<"classic" | "netflix">(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("theme") === "netflix") return "netflix";
+        const saved = localStorage.getItem("naman_theme_mode");
+        if (saved === "netflix" || saved === "classic") return saved;
+      } catch {
+        // ignore
+      }
+    }
+    return "classic";
+  });
   const [showNetflixIntro, setShowNetflixIntro] = useState(false);
 
   const handleSwitchToNetflix = () => {
     // Mount Netflix theme and trigger cinematic TA-DUM intro
     setThemeMode("netflix");
+    try {
+      localStorage.setItem("naman_theme_mode", "netflix");
+    } catch {
+      // ignore
+    }
     setShowNetflixIntro(true);
   };
 
@@ -44,9 +63,13 @@ export default function App() {
   };
 
   const handleSwitchToClassic = () => {
-    netflixAudio.pauseBgm();
     setShowNetflixIntro(false);
     setThemeMode("classic");
+    try {
+      localStorage.setItem("naman_theme_mode", "classic");
+    } catch {
+      // ignore
+    }
   };
 
   return (
@@ -61,8 +84,8 @@ export default function App() {
           onReplayIntro={handleReplayIntro}
         />
       ) : (
-        /* Classic High-Tech Cybernetic Portfolio View */
-        <div className="min-h-screen bg-[#06080d] text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden relative">
+        /* Classic High-Tech Cybernetic Portfolio View — Premium Black & Gold Edition */
+        <div className="min-h-screen bg-[#040406] text-[#f1f1eb] font-sans selection:bg-amber-400/30 selection:text-amber-200 overflow-x-hidden relative">
           {/* Animated Reading Progress Bar tracking scroll depth */}
           <ScrollProgressBar />
 
@@ -85,8 +108,15 @@ export default function App() {
             <AchievementsSection />
             <LeadershipEducation />
             <WhyAISection />
+            <LabExperimentsSection />
             <ContactSection />
           </main>
+
+          {/* Floating Sublevel OS Dock */}
+          <SublevelUtilityDock
+            onSwitchToNetflix={handleSwitchToNetflix}
+            onOpenResumePreview={() => setResumeModalOpen(true)}
+          />
 
           {/* Footer */}
           <Footer />

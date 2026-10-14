@@ -1,19 +1,14 @@
-import { RobotHero } from "@/components/ui/robot-hero";
+'use client'
 
-const settings = {
-  color: "#c4c4c4",
-  scale: 1,
-  pantallaColor: "#00ffc6",
-  pantallaBrillo: 1.2,
-  blinkCycle: 3.0,
-  metalness: 0.0,
-};
+import React from 'react'
+import { SplineSceneBasic } from "@/components/ui/demo"
 
-export default function Demo(props: Partial<typeof settings>) {
-  const s = { ...settings, ...props };
+export { SplineSceneBasic }
+
+export default function Demo() {
   return (
-    <div className="h-screen w-screen">
-      <RobotHero {...s} />
+    <div className="min-h-screen w-full bg-[#06080d] flex items-center justify-center p-4">
+      <SplineSceneBasic className="w-full max-w-5xl h-[600px]" />
     </div>
-  );
+  )
 }

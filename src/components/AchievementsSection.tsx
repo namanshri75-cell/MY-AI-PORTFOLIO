@@ -53,7 +53,7 @@ export const AchievementsSection: React.FC = () => {
     },
     {
       id: 4,
-      title: "Power BI BI Certification",
+      title: "Power BI Certification",
       date: "2023",
       content: "Completed OfficeMaster intensive professional workshop mastering dynamic business analytics dashboards, DAX formulas, data cleaning, and KPI visual reporting.",
       category: "Professional Credential",
